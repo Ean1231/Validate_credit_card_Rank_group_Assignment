@@ -61,31 +61,6 @@ class SharedButton extends StatelessWidget {
   }
 }
 
-class CardDisplay extends StatelessWidget {
-  final String number;
-  final String type;
-  final String country;
-
-  const CardDisplay({
-    super.key,
-    required this.number,
-    required this.type,
-    required this.country,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 0),
-      child: ListTile(
-        leading: const Icon(Icons.credit_card),
-        title: Text('**** **** **** ${number.substring(number.length - 4)}'),
-        subtitle: Text('$type | $country'),
-      ),
-    );
-  }
-}
-
 class ErrorMessage extends StatelessWidget {
   final String message;
   const ErrorMessage({super.key, required this.message});

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'shared_components.dart';
 
-class BannedCountriesWidget extends StatefulWidget {
+class BannedCountriesWidget extends StatelessWidget {
   final List<String> bannedCountries;
   final void Function(List<String>) onChanged;
 
@@ -13,55 +11,45 @@ class BannedCountriesWidget extends StatefulWidget {
   });
 
   @override
-  State<BannedCountriesWidget> createState() => _BannedCountriesWidgetState();
-}
-
-class _BannedCountriesWidgetState extends State<BannedCountriesWidget> {
-  final _controller = TextEditingController();
-
-  void _addCountry() {
-    final country = _controller.text.trim();
-    if (country.isNotEmpty && !widget.bannedCountries.contains(country)) {
-      final updated = List<String>.from(widget.bannedCountries)..add(country);
-      widget.onChanged(updated);
-      _controller.clear();
-    }
-  }
-
-  void _removeCountry(String country) {
-    final updated = List<String>.from(widget.bannedCountries)..remove(country);
-    widget.onChanged(updated);
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final controller = TextEditingController();
+
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        const Text('Banned Countries:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Wrap(
+          spacing: 8,
+          children: bannedCountries.map((country) => Chip(
+            label: Text(country),
+            onDeleted: () {
+              final updated = List<String>.from(bannedCountries)..remove(country);
+              onChanged(updated);
+            },
+          )).toList(),
+        ),
+        const SizedBox(height: 8),
         Row(
           children: [
             Expanded(
-              child: SharedInputField(
-                label: 'Add Banned Country',
-                controller: _controller,
+              child: TextField(
+                controller: controller,
+                decoration: const InputDecoration(hintText: 'Add country'),
               ),
             ),
-            SharedButton(
-              text: 'Add',
-              onPressed: _addCountry,
-              isPrimary: false,
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () {
+                final newCountry = controller.text.trim();
+                if (newCountry.isNotEmpty && !bannedCountries.contains(newCountry)) {
+                  final updated = List<String>.from(bannedCountries)..add(newCountry);
+                  onChanged(updated);
+                  controller.clear();
+                }
+              },
             ),
           ],
         ),
-        const SizedBox(height: 8),
-        Text('Banned Countries:', style: Theme.of(context).textTheme.titleMedium),
-        ...widget.bannedCountries.map((country) => ListTile(
-              title: Text(country),
-              trailing: IconButton(
-                icon: const Icon(Icons.delete, color: Colors.red),
-                onPressed: () => _removeCountry(country),
-              ),
-            )),
       ],
     );
   }

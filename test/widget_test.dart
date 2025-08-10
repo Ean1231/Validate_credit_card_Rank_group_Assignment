@@ -22,7 +22,7 @@ void main() {
   });
 
   test('CreditCard model serializes and deserializes', () {
-    final card = CreditCard(number: '4111111111111111', type: 'Visa', cvv: '123', issuingCountry: 'United States');
+    final card = CreditCard(number: '4111111111111111', type: 'Visa', cvv: '123', issuingCountry: 'United States', expiryDate: '', country: '', cardHolderName: '');
     final json = card.toJson();
     final fromJson = CreditCard.fromJson(json);
     expect(fromJson.number, card.number);

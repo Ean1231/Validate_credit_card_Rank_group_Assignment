@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
-// Alias the plugin import so we can still call CardScanner from the package
-import 'package:credit_card_scanner/credit_card_scanner.dart' as card_scanner_pkg;
+import 'package:credit_card_scanner/credit_card_scanner.dart';
 
-import 'shared_components.dart';
+class CardScanButton extends StatefulWidget {
+  final void Function(CardDetails result) onCardScanned;
 
-class CardScanner extends StatefulWidget {
-  final void Function(String number) onCardScanned;
-  const CardScanner({super.key, required this.onCardScanned});
+  const CardScanButton({super.key, required this.onCardScanned});
 
   @override
-  State<CardScanner> createState() => _CardScannerState();
+  State<CardScanButton> createState() => _CardScanButtonState();
 }
 
-class _CardScannerState extends State<CardScanner> {
+class _CardScanButtonState extends State<CardScanButton> {
   bool _scanning = false;
   String? _error;
 
@@ -21,15 +19,17 @@ class _CardScannerState extends State<CardScanner> {
       _scanning = true;
       _error = null;
     });
+
     try {
-      final result = await card_scanner_pkg.CardScanner.scanCard(
-        scanOptions: const card_scanner_pkg.CardScanOptions(
+      final result = await CardScanner.scanCard(
+        scanOptions: const CardScanOptions(
           scanCardHolderName: false,
-          scanExpiryDate: false,
+          scanExpiryDate: true,
         ),
       );
+
       if (result != null && result.cardNumber.isNotEmpty) {
-        widget.onCardScanned(result.cardNumber);
+        widget.onCardScanned(result);
       } else {
         setState(() => _error = 'No card detected.');
       }
@@ -45,11 +45,19 @@ class _CardScannerState extends State<CardScanner> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-          SharedButton(
-          text: _scanning ? 'Scanning...' : 'Scan Card', // null disables the button
-          onPressed: _scanning ? () {} : _scanCard,
+        ElevatedButton.icon(
+          onPressed: _scanning ? null : _scanCard,
+          icon: const Icon(Icons.camera_alt),
+          label: Text(_scanning ? 'Scanning...' : 'Scan Card'),
         ),
-        if (_error != null) ErrorMessage(message: _error!),
+        if (_error != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Text(
+              _error!,
+              style: const TextStyle(color: Colors.red),
+            ),
+          ),
       ],
     );
   }
