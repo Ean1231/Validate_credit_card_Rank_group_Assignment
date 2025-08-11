@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../models.dart';
+import '../models/models.dart';
 import '../features/card_form/card_form.dart';
 import '../widgets/card_display/styled_card_display.dart';
 import 'saved_cards_screen.dart';
@@ -57,12 +57,40 @@ class _HomeScreenState extends State<HomeScreen> {
     await prefs.setStringList('cards', cards.map((c) => jsonEncode(c.toJson())).toList());
   }
 
+  Future<void> _showCardSavedDialog() async {
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Card Saved'),
+        content: const Text('Your card has been saved successfully.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Close'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => SavedCardsScreen(cards: _cards)),
+              );
+            },
+            child: const Text('View Cards'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _addCard(CreditCard card) {
     final normalized = card.copyWith(type: card.type.trim().toLowerCase());
     setState(() {
       _cards.add(normalized);
     });
     _saveCards(_cards);
+    _showCardSavedDialog();
   }
 
   void _applyBannedCountries(List<String> list) async {

@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:credit_card_scanner/credit_card_scanner.dart';
 
-import '../../models.dart';
+import '../../models/models.dart';
 import '../../services/country_service.dart';
+import '../../utils/card_utils.dart' as card_utils;
 
 class CardForm extends StatefulWidget {
   final List<String> bannedCountries;
@@ -68,20 +70,11 @@ class _CardFormState extends State<CardForm> {
     super.dispose();
   }
 
-  String detectCardType(String number) {
-    final clean = number.replaceAll(' ', '');
-    if (clean.startsWith('4')) return 'visa';
-    if (clean.startsWith('5')) return 'mastercard';
-    if (clean.startsWith('34') || clean.startsWith('37')) return 'american express';
-    if (clean.startsWith('6')) return 'discover';
-    return 'unknown';
-  }
-
   void _notifyCardChanged() {
     if (widget.onCardChanged != null) {
       final card = CreditCard(
         number: _cardNumberController.text,
-        type: detectCardType(_cardNumberController.text),
+        type: card_utils.detectCardType(_cardNumberController.text),
         cvv: _cvv,
         issuingCountry: _issuingCountry,
         expiryDate: _expiryDateController.text,
@@ -96,7 +89,7 @@ class _CardFormState extends State<CardForm> {
     if (_formKey.currentState?.validate() ?? false) {
       final newCard = CreditCard(
         number: _cardNumberController.text,
-        type: detectCardType(_cardNumberController.text),
+        type: card_utils.detectCardType(_cardNumberController.text),
         cvv: _cvv,
         issuingCountry: _issuingCountry,
         expiryDate: _expiryDateController.text,
@@ -129,14 +122,23 @@ class _CardFormState extends State<CardForm> {
     if (result != null && result.cardNumber.isNotEmpty) {
       setState(() {
         _cardNumberController.text = result.cardNumber;
-        _expiryDateController.text = result.expiryDate ?? '';
+        final scanned = result.expiryDate ?? '';
+        _expiryDateController.text = _formatExpiry(scanned);
         _cardHolderNameController.text = result.cardHolderName ?? '';
-        _cardType = detectCardType(result.cardNumber);
+        _cardType = card_utils.detectCardType(result.cardNumber);
       });
       _notifyCardChanged();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No card detected')));
     }
+  }
+
+  String _formatExpiry(String input) {
+    final digits = input.replaceAll(RegExp(r'[^0-9]'), '');
+    if (digits.isEmpty) return '';
+    final mm = digits.length >= 2 ? digits.substring(0, 2) : digits;
+    final yy = digits.length > 2 ? digits.substring(2).substring(0, (digits.length - 2).clamp(0, 2)) : '';
+    return yy.isEmpty ? mm : '$mm/$yy';
   }
 
   void _openCountryPicker() async {
@@ -208,25 +210,38 @@ class _CardFormState extends State<CardForm> {
       child: Column(
         children: [
           TextFormField(
+            controller: _cardNumberController,
+            decoration: const InputDecoration(labelText: 'Card Number'),
+            onChanged: (val) {
+              setState(() => _cardType = card_utils.detectCardType(val));
+              _notifyCardChanged();
+            },
+            validator: (val) => val == null || val.length < 12 ? 'Invalid number' : null,
+            keyboardType: TextInputType.number,
+          ),
+          TextFormField(
             controller: _cardHolderNameController,
             decoration: const InputDecoration(labelText: 'Card Holder Name'),
             onChanged: (val) => _notifyCardChanged(),
             validator: (val) => val == null || val.isEmpty ? 'Enter card holder name' : null,
           ),
           TextFormField(
-            controller: _cardNumberController,
-            decoration: const InputDecoration(labelText: 'Card Number'),
-            onChanged: (val) {
-              setState(() => _cardType = detectCardType(val));
-              _notifyCardChanged();
-            },
-            validator: (val) => val == null || val.length < 12 ? 'Invalid number' : null,
-          ),
-          TextFormField(
             controller: _expiryDateController,
-            decoration: const InputDecoration(labelText: 'Expiry Date'),
+            decoration: const InputDecoration(labelText: 'Expiry Date (MM/YY)'),
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9/]')),
+              LengthLimitingTextInputFormatter(5),
+              _ExpiryDateTextInputFormatter(),
+            ],
             onChanged: (val) => _notifyCardChanged(),
-            validator: (val) => val == null || val.length < 5 ? 'Invalid expiry date' : null,
+            validator: (val) {
+              if (val == null || val.isEmpty) return 'Invalid expiry date';
+              final cleaned = val.trim();
+              final valid = RegExp(r'^(0[1-9]|1[0-2])/\d{2}$').hasMatch(cleaned);
+              if (!valid) return 'Use MM/YY';
+              return null;
+            },
           ),
           const SizedBox(height: 12),
           TextFormField(
@@ -252,6 +267,7 @@ class _CardFormState extends State<CardForm> {
               _notifyCardChanged();
             },
             validator: (val) => val == null || val.length < 3 ? 'Invalid CVV' : null,
+            keyboardType: TextInputType.number,
           ),
           const SizedBox(height: 12),
           ElevatedButton.icon(onPressed: _scanCard, icon: const Icon(Icons.camera_alt), label: const Text('Scan Card')),
@@ -259,6 +275,24 @@ class _CardFormState extends State<CardForm> {
           ElevatedButton(onPressed: _submit, child: const Text('Submit')),
         ],
       ),
+    );
+  }
+}
+
+class _ExpiryDateTextInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    var digits = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+    if (digits.length > 4) digits = digits.substring(0, 4);
+    String text;
+    if (digits.length <= 2) {
+      text = digits;
+    } else {
+      text = digits.substring(0, 2) + '/' + digits.substring(2);
+    }
+    return TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
     );
   }
 }

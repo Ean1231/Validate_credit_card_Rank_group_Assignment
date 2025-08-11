@@ -12,10 +12,10 @@ class CreditCard {
     required this.cvv,
     required this.issuingCountry,
     required this.expiryDate,
-    required this.cardHolderName, required String country,
+    required this.cardHolderName,
+    String country = '',
   });
 
-  // Backwards-compatible alias for UI code that expects 'country'
   String get country => issuingCountry;
 
   CreditCard copyWith({
@@ -32,7 +32,7 @@ class CreditCard {
       cvv: cvv ?? this.cvv,
       issuingCountry: issuingCountry ?? this.issuingCountry,
       expiryDate: expiryDate ?? this.expiryDate,
-      cardHolderName: cardHolderName ?? this.cardHolderName, country: '',
+      cardHolderName: cardHolderName ?? this.cardHolderName,
     );
   }
 
@@ -51,8 +51,7 @@ class CreditCard {
         cvv: json['cvv'],
         issuingCountry: json['issuingCountry'],
         expiryDate: json['expiryDate'],
-        cardHolderName: json['cardHolderName'], 
-        country: '',
+        cardHolderName: json['cardHolderName'],
       );
 }
 

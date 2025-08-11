@@ -174,7 +174,7 @@ class _CardThemeSpec {
           background: const LinearGradient(colors: [Color(0xFF1A4CA0), Color(0xFF0B7BD4)], begin: Alignment.topLeft, end: Alignment.bottomRight),
           foreground: Colors.white,
           numberColor: Colors.white,
-          buildBrandLogo: () => Image.network('https://upload.wikimedia.org/wikipedia/commons/5/53/Visa_2014_logo_detail.svg', height: 26),
+          buildBrandLogo: () => Image.network('https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Former_Visa_%28company%29_logo.svg/640px-Former_Visa_%28company%29_logo.svg.png', height: 26),
           buildDecoration: () => Align(
             alignment: Alignment.centerLeft,
             child: Container(margin: const EdgeInsets.only(left: 28), width: 180, height: 120, decoration: BoxDecoration(color: Colors.white.withOpacity(0.12), borderRadius: BorderRadius.circular(12))),
@@ -186,7 +186,7 @@ class _CardThemeSpec {
           background: const LinearGradient(colors: [Color(0xFF2E77BC), Color(0xFF6FB8E6)], begin: Alignment.topLeft, end: Alignment.bottomRight),
           foreground: Colors.white,
           numberColor: Colors.white,
-          buildBrandLogo: () => Image.network('https://upload.wikimedia.org/wikipedia/commons/3/30/American_Express_logo_%282018%29.svg', height: 28),
+          buildBrandLogo: () => Image.network('https://upload.wikimedia.org/wikipedia/commons/6/6d/MasterCard-Negativo_06.png', height: 28),
           buildDecoration: () => Align(
             alignment: Alignment.center,
             child: Opacity(
@@ -200,7 +200,7 @@ class _CardThemeSpec {
           background: const LinearGradient(colors: [Color(0xFF1F1F1F), Color(0xFF3A3A3A)], begin: Alignment.topLeft, end: Alignment.bottomRight),
           foreground: Colors.white,
           numberColor: Colors.white,
-          buildBrandLogo: () => Image.network('https://upload.wikimedia.org/wikipedia/commons/5/50/Discover_Card_logo.svg', height: 26),
+          buildBrandLogo: () => Image.network('https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Font_Awesome_5_brands_cc-discover.svg/640px-Font_Awesome_5_brands_cc-discover.svg.png', height: 26),
           buildDecoration: () => Align(
             alignment: Alignment.centerRight,
             child: Container(

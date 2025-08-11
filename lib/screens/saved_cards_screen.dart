@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models.dart';
+import '../models/models.dart';
 import '../widgets/card_display/styled_card_display.dart';
 
 class SavedCardsScreen extends StatelessWidget {
