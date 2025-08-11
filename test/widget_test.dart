@@ -5,6 +5,8 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:validate_credit_card/main.dart';
@@ -29,5 +31,8 @@ void main() {
     expect(fromJson.type, card.type);
     expect(fromJson.cvv, card.cvv);
     expect(fromJson.issuingCountry, card.issuingCountry);
+    expect(fromJson.expiryDate, card.expiryDate);
+    expect(fromJson.country, card.country);
+    expect(fromJson.cardHolderName, card.cardHolderName);
   });
 }
