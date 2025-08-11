@@ -10,7 +10,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:validate_credit_card/main.dart';
-import 'package:validate_credit_card/models.dart';
+import 'package:validate_credit_card/models/models.dart';
 
 void main() {
   testWidgets('Credit Card Form renders and validates', (WidgetTester tester) async {

@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'models.dart';
+import 'models/models.dart';
 import 'features/card_form/card_form.dart';
 import 'widgets/card_display/styled_card_display.dart';
 import 'screens/saved_cards_screen.dart';
@@ -22,7 +22,7 @@ class CreditCardApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Credit Card Validation1',
+      title: 'Credit Card Validation',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
